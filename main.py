@@ -16,11 +16,14 @@ for title in titles:
     if a_tag:
         links.append("https://www.dea.gov/" + str(a_tag["href"]))
 
+press_titles = []
 for link in links:
     article_url = link
     response = requests.get(article_url)
     soup = BeautifulSoup(response.content, "html.parser")
-    print(soup)
+    press_titles.append(soup.find_all("h2", class_="press__title"))
+
+print(press_titles)
 
 
 # Print the title and date of each press release
