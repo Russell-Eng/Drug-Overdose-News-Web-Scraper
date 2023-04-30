@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import sys
 
-pages = 10
+pages = 2
 links = []
 for i in range(pages):
     url = f"https://www.dea.gov/what-we-do/news/press-releases?page={i}"
@@ -28,8 +29,8 @@ for link in links:
     response = requests.get(article_url)
     soup = BeautifulSoup(response.content, "html.parser")
 
-    date = soup.find("div", class_="press__date").text.strip()
-    title = soup.find("h2", class_="press__title").text.strip()
+    date = soup.find("div", class_="press__date").text.strip().encode("utf-8")
+    title = soup.find("h2", class_="press__title").text.strip().encode("utf-8")
     paragraph_div = soup.find("div", class_="wysiwyg")
     first_paragraph = paragraph_div.find("p").text.strip()
     index = len(first_paragraph)
@@ -38,13 +39,16 @@ for link in links:
         if char_index != -1 and char_index < index:
             index = char_index
             break
-    location = first_paragraph[:index].strip()
+    location = first_paragraph[:index].strip().encode("utf-8")
 
     data["Title"].append(title)
     data["Date"].append(date)
-    data["Summary"].append(first_paragraph)
+    data["Summary"].append(first_paragraph.encode("utf-8"))
     data["Location"].append(location)
 
 df = pd.DataFrame(data)
-print(df)
+
 df.to_csv("news.csv", index=False)
+
+
+
