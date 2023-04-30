@@ -2,22 +2,21 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-
-url = "https://www.dea.gov/what-we-do/news/press-releases?page=0"
-response = requests.get(url)
-soup = BeautifulSoup(response.content, "html.parser")
-# print(soup)
-
-# Find all the press release titles and dates
-titles = soup.find_all("h3", class_="teaser__heading")
-dates = soup.find_all("div", class_="teaser__date")
+pages = 10
 links = []
-for title in titles:
-    a_tag = title.find("a")
-    if a_tag:
-        links.append("https://www.dea.gov/" + str(a_tag["href"]))
+for i in range(pages):
+    url = f"https://www.dea.gov/what-we-do/news/press-releases?page={i}"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
 
-press_summary = []
+    # Find all the press release titles and dates
+    titles = soup.find_all("h3", class_="teaser__heading")
+
+    for title in titles:
+        a_tag = title.find("a")
+        if a_tag:
+            links.append("https://www.dea.gov/" + str(a_tag["href"]))
+
 data = {
     "Title": [],
     "Date": [],
@@ -45,16 +44,7 @@ for link in links:
     data["Date"].append(date)
     data["Summary"].append(first_paragraph)
     data["Location"].append(location)
-    # press_summary.append(f"{date} - {title} - {first_paragraph}")
 
-# print(press_summary)
 df = pd.DataFrame(data)
-print(df["Location"])
-
-
-# Print the title and date of each press release
-# for i in range(len(titles)):
-#     title = titles[i].text.strip()
-#     date = dates[i].text.strip()
-#     # link = links[i]["href"]
-#     print(f"{date} - {title} - {links[i]}")
+print(df)
+df.to_csv("news.csv", index=False)
