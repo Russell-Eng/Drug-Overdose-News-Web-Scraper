@@ -1,9 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import sys
 
-pages = 2
+pages = 5
 links = []
 for i in range(pages):
     url = f"https://www.dea.gov/what-we-do/news/press-releases?page={i}"
@@ -22,7 +21,8 @@ data = {
     "Title": [],
     "Date": [],
     "Summary": [],
-    "Location": []
+    "Location": [],
+    "Link": []
 }
 for link in links:
     article_url = link
@@ -45,6 +45,7 @@ for link in links:
     data["Date"].append(date)
     data["Summary"].append(first_paragraph.encode("utf-8"))
     data["Location"].append(location)
+    data["Link"].append(link)
 
 df = pd.DataFrame(data)
 
